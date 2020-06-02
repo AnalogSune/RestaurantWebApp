@@ -1,0 +1,58 @@
+
+<div class="mx-auto" style="width: 400px;">
+    <div class="login-main-text">
+        <h1>Restor Login Page</h1>
+     </div>
+        <div class="login-form">
+           <form>
+              <div class="form-group">
+                 <label>Username or Email</label>
+                 <input type="text" class="form-control" placeholder="User Name" id="username_or_email">
+              </div>
+              <div class="form-group">
+                 <label>Password</label>
+                 <input type="password" class="form-control" placeholder="Password" id="password">
+              </div>
+              <button type="button" class="btn btn-login" id="login_user">Login</button>
+              <button type="button" class="btn btn-register" id="register_user">Register</button>
+           </form>
+    </div>
+</div>
+
+<script> 
+$( document ).ready(function() {
+    $( "#login_user" ) .click (function(){
+        if (!$('#username_or_email').val()){
+            addMessage('Username is empty!');
+            return;
+        }
+        if (!$('#password').val()){
+            addMessage('Password is empty!');
+            return;
+        }
+        $.post('API/login.php', 
+            {username: $('#username_or_email').val(), password: $('#password').val()}, 
+        function (data) {
+            jsonData = JSON.parse(data);
+            localStorage.setItem("username", jsonData.username);
+            localStorage.setItem("customer_id", jsonData.customer_id);
+            localStorage.setItem("customer_type", jsonData.customer_type);
+            localStorage.setItem("login", "true");
+            if (localStorage.getItem("customer_type") == 0){
+                loadPage('makeReservation');
+                changeMenuButtonsClient();
+            }
+            if (localStorage.getItem("customer_type") == 1){
+                loadPage('admin/makeReservation')
+                changeMenuButtonsAdmin();
+            }
+        }).fail(function (){
+            addMessage('Login failed.');
+        });
+    });
+
+    $( "#register_user" ) .click (function(){
+            loadPage('register');
+    });
+}); 
+</script>

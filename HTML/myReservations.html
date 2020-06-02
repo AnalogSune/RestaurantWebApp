@@ -1,0 +1,176 @@
+<div class="mx-auto" style="width: 800px;">
+<header id="r">
+    My Reservations
+</header>
+
+<div id="admin-search" hidden="true">
+  <div class="form-group">
+    <i class="fas fa-search" aria-hidden="true"></i>
+    <input id="searchBar" onkeyup="updateSearch($(this).val())" class="form-control form-control-sm ml-3 w-75" type="text" placeholder="Search"
+    aria-label="Search">
+    <label for="user-list">Search for customer: </label>
+  </div>
+  <div class="form-group">
+    <div id="customer_search_results"></div>
+  </div>
+</div>
+<div id="reservations" style="color: red;"></div>
+
+</div>
+
+<script>
+
+isEditing = false;
+var cust_info = new Array();
+
+$(document).ready(function(){
+  if (localStorage.getItem('customer_type') == 1){
+    $('#admin-search').prop('hidden', false);
+
+    $.get ('API/getAllCustomers.php',
+    function(data){
+        jsonData = JSON.parse(data);
+        for (x in jsonData) {
+            info = {id: jsonData[x].id, username : jsonData[x].username, email : jsonData[x].email, fname: jsonData[x].fname, lname : jsonData[x].lname, phone_number : jsonData[x].phone_number};
+            cust_info.push(info);
+        }
+    });
+  }
+  else{
+    getReservations(localStorage.getItem('customer_id'));
+  }
+});
+
+function updateSearch(value){
+  var value = value.toLowerCase();
+  var found_names = $.grep(cust_info, function(v) {
+      return v.username.includes(value) || v.fname.includes(value) || v.lname.includes(value) || v.phone_number.includes(value) || v.email.includes(value);
+  });
+  cust_list = "<select onchange='getReservations($(this).val())' class='form-control' id='user-list'>";
+  for (x in found_names){
+      cust_list += "<option value='"+found_names[x].id+"'>" + found_names[x].username +"</option>";
+  }
+  cust_list += "</select>";
+  $('#customer_search_results').html(cust_list);
+  getReservations($('#user-list').val());
+}
+
+function getReservations(id){
+  $.post('API/myReservations.php',
+  {id: id},
+    function(data){
+      var txt = "";
+      jsonData = JSON.parse(data);
+      txt += "<table id='reservation_table' border='1'>";
+      txt += "<tr><th>Time</th>" + 
+      "<th>Date</th>" + 
+      "<th>Status</th>" + 
+      "<th>Number of People</th></tr>";
+      for (x in jsonData) {
+        txt += "<tr id='row" + jsonData[x].id + "'>";
+        txt += getInfoForTable(jsonData[x].id, jsonData[x].time, jsonData[x].date, jsonData[x].status, jsonData[x].num_of_people);
+        txt += "</tr>";
+      }
+      txt += "</table>";
+      $("#reservations").html(txt);
+  }).fail(function(xhr){
+    $('#reservations').html("No Reservations");
+  })
+}
+
+function edit(button){
+  if (!isEditing){
+    isEditing = true;
+    initTime = $("#time"+button.value).html();
+    initDate = $("#date"+button.value).html();
+    initStatus = $("#status"+button.value).html();
+    initNumOfPeople = $("#num_of_people"+button.value).html();
+    editHtml =  "<td><div id='time_placeholder' name='time_placeholder'></div></td>"+
+                "<td><input type='date' id='datestamp' value='" + initDate + "'</td>"+
+                "<td>" + initStatus + "</td>"+
+                "<td><input type='text' id='num_of_people' value='" + initNumOfPeople + "'</td>"+
+                "<td><button id='confirmEdit' onclick='confirmEdit(" + button.value + ")' value='" + button.value + "'>Confirm</button></td>"+
+                "<td><button id='cancelEdit' onclick=\"cancelEdit(" + button.value + ",'" + initTime + "','" + 
+                  initDate + "'," + initStatus + "," + initNumOfPeople +")\" value='" + button.value + "'>Cancel</button></td>";
+    
+    $('#row' + button.value).html(editHtml);
+    updateTimes(initTime);
+    $('#datestamp').on("change", updateCurrentTimes);
+    $('#num_of_people').on("change", updateCurrentTimes);
+  }
+}
+
+function updateCurrentTimes(){
+  updateTimes($("timeDropdown").val());
+}
+
+function updateTimes(defaultTime){
+	if (!$.isNumeric($("#num_of_people").val()))
+	{
+    addMessage('Number of people is invalid');
+    $("#timeDropdown").remove();
+		return;
+	}
+	$.get('API/getAvailableTimes.php', 
+		{date: $('#datestamp').val(), num_of_people: $('#num_of_people').val()}, 
+	function (data) {
+		timeDropdown = timesToDropdown(JSON.parse(data), defaultTime);
+		if (timeDropdown){
+			toggleButton(false);
+			$('#time_placeholder').html(timeDropdown);
+		}else{
+      $('#time_placeholder').html("Unavailable");
+    }
+  }).fail(fail_callback);
+}
+
+function getInfoForTable(id, time, date, status, num_of_people){
+  txt = "<td id='time" + id + "' style='width:150px;'>" + time + "</td>"+
+        "<td id='date" + id + "' style='width:180px;'>" + date + "</td>"+
+        "<td id='status" + id + "'>" + status + "</td>"+
+        "<td id='num_of_people" + id + "' style='width:185px;'>" + num_of_people + "</td>";
+        chosen_date = new Date(date);
+        cur_date = new Date();
+        if (chosen_date > cur_date){
+          console.log(chosen_date + " - " + cur_date);
+          txt += "<td><button id='edit' onclick='edit(this)' value='" + id + "'>Edit</button> </td>"+
+          "<td><button id='cancel' onclick='cancel(this)' value='" + id + "'>Cancel</button> </td>";
+        }
+  return txt;
+}
+
+function cancelEdit(id, time, date, status, num_of_people){
+  if (isEditing){
+    txt = getInfoForTable(id, time, date, status, num_of_people);
+    $('#row' + id).html(txt);
+    isEditing = false;
+  }
+}
+
+function confirmEdit(id){
+	if (!$("#timeDropdown").val() || !$("#num_of_people").val() || !$.isNumeric($("#num_of_people").val()))
+	{
+		addMessage('You need to provide a Date and Number of people');
+		return;
+	}
+  $.post('API/editReservation.php',
+    { id : id, date : $('#datestamp').val(), num_of_people : $('#num_of_people').val(), time : $('#timeDropdown').val() })
+    .done(function(){
+      cancelEdit(id, $('#timeDropdown').val() + ":00:00", $('#datestamp').val(), 2, $('#num_of_people').val());
+      addMessage("Reservation has been updated", false);
+    })
+    .fail(fail_callback)
+}
+
+function cancel(button){
+  if (!isEditing){
+    $.post('API/cancelReservation.php',
+      { id : button.value })
+      .done(function(msg){
+        addMessage(msg, false);
+        $('#row' + button.value).remove();
+      })
+      .fail(fail_callback)
+  }
+}
+</script>

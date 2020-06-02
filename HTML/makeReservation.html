@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<title>Home</title>
+</head>
+<body >
+	<div class="mx-auto" style="width: 200px;">
+	<h2> Make a reservation! </h2>
+	<div class="input-group">
+		<input type="date" id="datestamp" name="datestamp" min="2018-01-01" max="2022-12-31">
+			<label for="num_for_people">Number of people:</label>
+			<input type="text" id="num_of_people" name="num_of_people">
+			<div id="time_placeholder" name="time_placeholder"> </div>
+	</div>
+	<div class="input-group">
+		<button type="button" class="btn" id="check_reserv">Check Availability</button>
+  	    <button type="button" class="btn" id="make_reserv" disabled="true">Make Reservation</button>
+  	</div>
+</div>
+</body>
+</html>
+
+<script>
+
+var script = "JS/reservationElements.js";
+$.getScript(script);
+
+$( document ).ready(function() {
+$("#datestamp").on("change", function(){
+	toggleButton();
+});
+
+$("#num_of_people").on("change", function(){
+	toggleButton();
+});
+
+$( "#check_reserv" ) .click (function(){
+	if (!$('#datestamp').val() || !$("#num_of_people").val() || !$.isNumeric($("#num_of_people").val()))
+	{
+		addMessage('You need to provide a Date and Number of people');
+		return;
+	}
+	if (new Date($("#datestamp").val()) < new Date()){
+		addMessage('You need to pick a later Date');
+		return;
+	}
+	$.get('API/getAvailableTimes.php', 
+		{date: $('#datestamp').val(), num_of_people: $('#num_of_people').val()}, 
+	function (data) {
+		timeDropdown = timesToDropdown(JSON.parse(data));
+		if (timeDropdown){
+			toggleButton(false);
+			$('#time_placeholder').html(timeDropdown);
+		}
+		else{
+            addMessage("No available reservation for this date");
+            toggleButton();
+        }
+	}).fail(fail_callback);
+});
+
+$( "#make_reserv" ) .click (function(){
+		$.post('API/makeReservation.php',
+		{date: $('#datestamp').val(), num_of_people: $('#num_of_people').val(),
+		time: $('#timeDropdown').val(), id: localStorage.getItem('customer_id')}
+		).fail(fail_callback)
+		.done(function (msg){
+			addMessage(msg, false);
+		});
+});
+});
+function toggleButton(disable = true){
+	$("#make_reserv").prop('disabled', disable);
+	$('#time_placeholder').empty();
+}
+</script>

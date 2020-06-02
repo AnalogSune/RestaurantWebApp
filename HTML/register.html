@@ -1,0 +1,98 @@
+<form class="mx-auto" style="width:400px">
+    <div>
+       <div class="form">
+          <label>Username</label>
+          <input type="text" class="form-control" placeholder="User Name" id="username">
+       </div>
+       <div class="form">
+          <label>Email</label>
+          <input type="text" class="form-control" placeholder="example@example.com" id="email">
+       </div>
+       <div class="form">
+          <label>Phone Number</label>
+          <input type="text" class="form-control" placeholder="Phone Number" id="phone_number">
+       </div>
+       <div class="form">
+          <label>First Name</label>
+          <input type="text" class="form-control" placeholder="First Name" id="fname">
+       </div>
+       <div class="form">
+          <label>Last Name</label>
+          <input type="text" class="form-control" placeholder="Last Name" id="lname">
+       </div>
+       <div class="form">
+          <label>Password</label>
+          <input type="password" class="form-control" placeholder="Password" id="password_1">
+       </div>
+       <div class="form">
+          <label>Confirm Password</label>
+          <input type="password" class="form-control" placeholder="Confirm Password" id="password_2">
+       </div>
+    </div>
+    <button type="button" class="btn btn-secondary" id="register_btn">Register</button>
+    <p>
+      Already a member? <a href="index.html">Sign in</a>
+    </p>
+ </form>
+
+ <script>
+$( document ).ready(function() {
+   $( '#register_btn' ) .click (function(){
+      if (checkInputs()){
+        $.post('API/register.php', 
+            {username: $('#username').val(), email: $('#email').val(), phone_number: $('#phone_number').val(), fname: $('#fname').val(),
+            lname: $('#lname').val() , password: $('#password_1').val(), cust_type : (localStorage.getItem("customer_type") == 1 ? 1 : 0)})
+         .done(function(msg){
+            if (localStorage.getItem("customer_type") == null){
+               changeMenuButtonsClient(true);
+               loadPage('login');
+               addMessage(msg);
+            } else {
+               addMessage("New admin has been added");
+            }
+         })
+         .fail(function (xhr){
+            addMessage(xhr.responseText);
+        });
+      }
+    });
+}); 
+
+function checkInputs(){
+   noErrors = true;
+   if (!$('#username').val()){
+      addMessage('Username field is empty!');
+      noErrors = false;
+   }
+   if (!$('#email').val()){
+      addMessage('Email field is empty!');
+      noErrors = false;
+   }
+   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+   if(!$('#email').val().match(re)){
+      addMessage('Email format is not correct!');
+      noErrors = false;
+   }
+   if (!$('#phone_number').val()){
+      addMessage('Phone number field is empty!');
+      noErrors = false;
+   }
+   if (!$('#fname').val()){
+      addMessage('First name field is empty!');
+      noErrors = false;
+   }
+   if (!$('#lname').val()){
+      addMessage('Last name field is empty!');
+      noErrors = false;
+   }
+   if (!$('#password_1').val()){
+      addMessage('Password field is empty!');
+      noErrors = false;
+   }
+   if ($('#password_1').val() != $('#password_2').val()){
+      addMessage('Passwords do not match!');
+      noErrors = false;
+   }
+   return noErrors;
+}
+ </script>

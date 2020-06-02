@@ -1,0 +1,134 @@
+<div class="mx-auto" style="width: 500px;">
+    <div class="reservation-text-main-text" style="margin: 40px;" id="main_form">
+        <h1>Reservations Settings</h1>
+     </div>
+        <h3>Select Reservation Duration</h3>
+        <select id="reservation_duration_table" class="browser-default custom-select" style="margin:20px">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            </select>
+            <h3>Select Restaurant Schedule</h3>
+            <div id="defaultTimes"></div>
+        
+        <div>
+            <h3>Available Tables: </h3>
+            <input type="text" id="available_tables"></input>
+        </div>
+        <button type="button" hidden="true" class="btn btn-success" id="confirm_changes">Confirm Changes</button>
+        <p id="error_message" style="color: red;" hidden="true"> Open time must be later than close time!</p>
+</div>
+
+<script>
+
+changes = {};
+timesChanged = new Array();
+errorInForm = {};
+
+$(document).ready(function(){
+    $.get('API/getReservationSettings.php',
+    function(data){
+        jsonData = JSON.parse(data);
+        table = "<table class='table table-dark'>" +
+                "<thread>" +
+                "<tr>" +
+                "<th scope='col'>#</th>" +
+                "<th scope='col'>Day</th>" +
+                "<th scope='col'>Open Time</th>" +
+                "<th scope='col'>Close Time</th>" +
+                "</tr>" +
+                "</thread>" +
+                "<tbody>";
+        for (x in jsonData){
+            if (jsonData[x].open_time == null || jsonData[x].close_time == null){
+                jsonData[x].open_time = "Not Open";
+                jsonData[x].close_time = "Not Open";
+            }
+            table += "<tr>" +
+                     "<th scope='row'>" + (parseInt(x) + 1) + "</th>" +
+                     "<td>" + jsonData[x].day + "</td>" +
+                     "<td>" + getTimes(parseInt(x), true, parseInt(jsonData[x].open_time))  + "</td>" +
+                     "<td>" + getTimes(parseInt(x), false, parseInt(jsonData[x].close_time)) + "</td>" +
+                     "</tr>";
+        }
+        table += "</tbody>",
+                 "</table>";
+        $('#defaultTimes').html(table);
+        $('#reservation_duration_table').val(jsonData[0].reservation_duration);
+        $('#available_tables').val(jsonData[0].available_tables);
+    });
+});
+
+function timeChanged(val, open, id){
+    other = $("#" + getTimeID(id, !open));
+    if (other.val() != 25 && val == 25 || (other.val() == 25 && val != 25)){
+        other.val(val);
+        timeChanged(val, !open, id);
+    }
+    let cur_id = getTimeID(id, open);
+    if ((open === true && timeToIndex(val) >= timeToIndex(other.val())) || (open === false && timeToIndex(val) <= timeToIndex(other.val()))){
+        $('#confirm_changes').prop('hidden', true);
+        $('#error_message').prop('hidden', false);
+        errorInForm[cur_id] = "error";
+        return;
+    }
+    if (errorInForm[cur_id]) delete errorInForm[cur_id];
+    timesChanged.push({ value: val, open: open, id: id });
+    console.log(errorInForm);
+    enableButton();
+}
+
+function enableButton(){
+    if (Object.keys(errorInForm) == 0){
+        $('#confirm_changes').prop('hidden', false);
+        $('#error_message').prop('hidden', true);
+    }
+}
+
+$('#available_tables').change(function(){
+    changes.tables = this.value;
+    console.log(changes);
+    enableButton();
+});
+
+$('#reservation_duration_table').change(function(){
+    changes.duration = this.value;
+    console.log(changes);
+    enableButton();
+});
+
+$('#confirm_changes').click(function(){
+    $.post('API/setReservationSettings.php',
+    {changes: JSON.stringify(changes), times: timesChanged})
+    .fail(fail_callback)
+    .done(success_callback);
+});
+
+function getTimeID(id, open){
+    return (open ? "open": "close") + id + "times";
+}
+
+function timeToIndex(time){
+    t = parseInt(time);
+    if (time < 7){
+        t += 24;
+    }
+    console.log(t);
+    return t;
+}
+
+function getTimes(id, open, selected = 0){
+    cur_id = getTimeID(id, open);
+    str = "<select onchange='timeChanged($(this).val(), " + open +", "+id+")' id='" + cur_id + "'>";
+    str += "<option value='25'>Closed" + "</option>";
+    time = 7;
+    for (var i = 0; i < 24; i++){
+        str += "<option value='" + time +"' " + (selected===time ? "selected" : "") + ">" + time +":00:00" + "</option>";
+        time++;
+        if (time > 23) time = 0;
+    }
+    str += "</select>";
+    return str;        
+}
+
+</script>
