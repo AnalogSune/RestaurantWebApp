@@ -39,10 +39,12 @@ $( document ).ready(function() {
             localStorage.setItem("customer_type", jsonData.customer_type);
             localStorage.setItem("login", "true");
             if (localStorage.getItem("customer_type") == 0){
+                makeMenuChanges();
                 loadPage('makeReservation');
                 changeMenuButtonsClient();
             }
             if (localStorage.getItem("customer_type") == 1){
+                makeMenuChanges();
                 loadPage('admin/makeReservation')
                 changeMenuButtonsAdmin();
             }

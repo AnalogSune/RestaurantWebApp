@@ -24,12 +24,12 @@ else{
     exit();
 }
 
+//Gets Default Restaurant Times for the specific day from database
 function getDefaultTimes($day) : DefaultSchedule {
     try{
         $schedule = new DefaultSchedule();
         $conn = connectToDb();
-        $query = $conn->prepare("SELECT open_time, close_time, 
-        reservation_duration, available_tables
+        $query = $conn->prepare("SELECT open_time, close_time, reservation_duration, available_tables
         FROM days_default_time
         WHERE day=? LIMIT 1");
         $query->bind_param("s", $day);
@@ -41,6 +41,9 @@ function getDefaultTimes($day) : DefaultSchedule {
             if ($query->fetch()){
                 return $schedule;
             }
+        } else {
+            $message = "No available times";
+            echo $message;
         }
         $query->close();
         disconnectFromDb($conn);
@@ -60,6 +63,7 @@ function timeToIndex($time){
     return $t;
 }
 
+//Returns an array with the available reservation times based on availables_tables for the specific day
 function getDefaultTimeSlots(DefaultSchedule $schedule, $tables_needed) : array {
     $final_reservations = array();
     $current_time = $schedule->GetOpenTime();
@@ -78,6 +82,7 @@ function getDefaultTimeSlots(DefaultSchedule $schedule, $tables_needed) : array 
     return $final_reservations;
 }
 
+//Returns an array with the times available after computing the reservations already made
 function getFinalTimeSlots(array $defaultTimeSlots, $date) : array{
     $finalTimeSlots = $defaultTimeSlots;
     $conn = connectToDb();

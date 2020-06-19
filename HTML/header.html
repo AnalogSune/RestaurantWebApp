@@ -1,59 +1,33 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Restaurant</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="#"  id="home_btn">
+    <img src="images/dinner.png" width="30" height="30" class="d-inline-block align-top" alt="">
+    Restaurant
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
   
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link"id="menu" href="#">Menu<span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item active">
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+  <div class="navbar-nav">
+          <a class="nav-link" id="menu" href="#">Menu<span class="sr-only">(current)</span></a>
           <a class="nav-link" hidden="true" id="make_reservation" href="#">Make Reservation<span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item active">
           <a class="nav-link" hidden="true" id="view_reservations" href="#">View your Reservations<span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item active">
           <a class="nav-link" hidden="true" id="reservations_settings" href="#">Reservations settings<span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item active">
           <a class="nav-link" hidden="true" id="create_admin" href="#">Create an admin<span class="sr-only">(current)</span></a>
-        </li>
-        <!-- <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Dropdown
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Something else here</a>
+          <div class="navbar-btn my-2 my-lg-0">
+              <form class="btn-nav navbar-right">
+              <button hidden="true" class="btn btn-outline-success my-2 my-sm-0" type="submit" id="logout">Log out</button>
+              </form>
           </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#">Disabled</a>
-        </li>
-      </ul> -->
-        <!-- <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form> -->
-  <div class="navbar-btn">
-      <form class="btn-nav">
-      <button hidden="true" class="btn btn-outline-success my-2 my-sm-0" type="submit" id="logout">Log out</button>
-      </form>
-    </div>
-  </nav>
+    </nav>
 </div>
 
 <script>
-  
-if (localStorage.getItem("login") && localStorage.getItem("customer_type") == 0){
+  if (localStorage.getItem("login") && localStorage.getItem("customer_type") == 0){
   changeMenuButtonsClient();
 } else if (localStorage.getItem("login") && localStorage.getItem("customer_type") == 1){
   changeMenuButtonsAdmin();
+  $('#view_reservations').html("View all Reservations");
 }
 
 $('#logout').click(function(){
@@ -64,6 +38,7 @@ $('#logout').click(function(){
   loadPage("login");
   changeMenuButtonsClient(true);
   changeMenuButtonsAdmin(true);
+  $('#menu').prop('hidden', false);
 });
 
 $('#view_reservations').click (function(){
@@ -83,6 +58,14 @@ $( "#reservations_settings" ) .click (function(){
 
 $( "#create_admin" ) .click (function(){
   loadPage("register");
+});
+
+$( "#menu" ) .click (function(){
+  loadPage("menu");
+});
+
+$( "#home_btn" ) .click (function(){
+  loadPage("../index");
 });
 
 </script>

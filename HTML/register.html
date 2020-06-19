@@ -1,42 +1,48 @@
 <form class="mx-auto" style="width:400px">
-    <div>
-       <div class="form">
-          <label>Username</label>
-          <input type="text" class="form-control" placeholder="User Name" id="username">
+   <h2>Register Form</h2>
+    <fieldset>
+       <div class="form-group">
+          <label for="username">Username</label>
+          <span><input type="text" class="form-control" placeholder="User Name" id="username"></span>
        </div>
-       <div class="form">
-          <label>Email</label>
-          <input type="text" class="form-control" placeholder="example@example.com" id="email">
+       <div class="form-group">
+          <label for="email">Email</label>
+          <span><input type="text" class="form-control" placeholder="example@example.com" id="email"></span>
        </div>
-       <div class="form">
-          <label>Phone Number</label>
-          <input type="text" class="form-control" placeholder="Phone Number" id="phone_number">
+       <div class="form-group">
+          <label for="phone_number">Phone Number</label>
+         <span><input type="text" class="form-control" placeholder="Phone Number" id="phone_number"></span>
        </div>
-       <div class="form">
-          <label>First Name</label>
-          <input type="text" class="form-control" placeholder="First Name" id="fname">
+       <div class="form-group">
+          <label for="fname">First Name</label>
+          <span><input type="text" class="form-control" placeholder="First Name" id="fname"></span>
        </div>
-       <div class="form">
-          <label>Last Name</label>
-          <input type="text" class="form-control" placeholder="Last Name" id="lname">
+       <div class="form-group">
+          <label for="lname">Last Name</label>
+          <span><input type="text" class="form-control" placeholder="Last Name" id="lname"></span>
        </div>
-       <div class="form">
-          <label>Password</label>
-          <input type="password" class="form-control" placeholder="Password" id="password_1">
+       <div class="form-group">
+          <label for="password_1">Password</label>
+          <span><input type="password" class="form-control" placeholder="Password" id="password_1"></span>
        </div>
-       <div class="form">
-          <label>Confirm Password</label>
-          <input type="password" class="form-control" placeholder="Confirm Password" id="password_2">
+       <div class="form-group">
+          <label for="password_2">Confirm Password</label>
+          <span><input type="password" class="form-control" placeholder="Confirm Password" id="password_2"></span>
        </div>
-    </div>
+    </fieldset>
     <button type="button" class="btn btn-secondary" id="register_btn">Register</button>
-    <p>
+    <div id="already_a_member">
       Already a member? <a href="index.html">Sign in</a>
-    </p>
+    </div>
  </form>
 
  <script>
 $( document ).ready(function() {
+
+if (localStorage.getItem("customer_type") == 1){
+   $("#already_a_member").remove();
+}
+
    $( '#register_btn' ) .click (function(){
       if (checkInputs()){
         $.post('API/register.php', 
@@ -58,6 +64,7 @@ $( document ).ready(function() {
     });
 }); 
 
+//perform all test at register form fields and returns a message if not correct
 function checkInputs(){
    noErrors = true;
    if (!$('#username').val()){
@@ -77,6 +84,10 @@ function checkInputs(){
       addMessage('Phone number field is empty!');
       noErrors = false;
    }
+   if (!parseInt($('#phone_number').val())){
+      addMessage('Phone number not in correct format!');
+      noErrors = false;
+   }
    if (!$('#fname').val()){
       addMessage('First name field is empty!');
       noErrors = false;
@@ -89,10 +100,15 @@ function checkInputs(){
       addMessage('Password field is empty!');
       noErrors = false;
    }
+   if (($('#password_1').val().length) < 8){
+      addMessage('Password must be at least 8 characters long!');
+      noErrors = false;
+   }
    if ($('#password_1').val() != $('#password_2').val()){
       addMessage('Passwords do not match!');
       noErrors = false;
    }
    return noErrors;
 }
+
  </script>

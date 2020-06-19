@@ -1,36 +1,41 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title style="text-align: center;">Home for admin</title>
-</head>
 <body>
-    <h2> Search for a customer</h2>
-	<div class="mx-auto" style="width: 500px;">
+    <div class="mx-auto form-group" style="width: 500px;">
+    <div id="admin-search">
+        <h2> Search for a customer</h2>
         <div class="form-group">
             <i class="fas fa-search" aria-hidden="true"></i>
+            <label for="user-list">Search for customer: </label>
             <input id="searchBar" class="form-control form-control-sm ml-3 w-75" type="text" placeholder="Search"
             aria-label="Search">
-            <label for="user-list">Search for customer: </label>
         </div>
-        <div class="form-group">
+        <div class="input-group">
             <div id="customer_search_results"></div>
         </div>
-	<h2> Make a reservation! (admin)</h2>
-	<div class="input-group">
-		<input type="date" id="datestamp" name="datestamp" min="2018-01-01" max="2022-12-31">
-			<label for="num_for_people">Number of people:</label>
-			<input type="text" id="num_of_people" name="num_of_people">
-			<div id="time_placeholder" name="time_placeholder"> </div>
-	</div>
-	<div class="input-group">
+    </div>
+
+	<div class="form-group" id="reservation_info">
+        <h2> Make a reservation</h2>
+        <label>Pick a Date:</label>
+		<input class="form-control-sm ml-3 w-75" type="date" id="datestamp" name="datestamp" max="2022-12-31">
+    </div>
+    <div>
+        <label>Number of people:</label>
+		<input id="num_of_people" name="num_of_people" class="form-control form-control-sm ml-3 w-75" type="text" placeholder="Number of people" aria-label="Search">
+    </div class="form-group">
+    <div id="time_placeholder" name="time_placeholder"> </div>
+    
+	<div class="form-group" id="reserv_buttons">
 		<button type="button" class="btn" id="check_reserv">Check Availability</button>
   	    <button type="button" class="btn" id="make_reserv" disabled="true">Make Reservation</button>
   	</div>
 </div>
 </body>
 </html>
+
 <script>
-    
+
 var script = "JS/reservationElements.js";
 $.getScript(script);
 
@@ -58,14 +63,14 @@ var cust_info = new Array();
         var found_names = $.grep(cust_info, function(v) {
             return v.username.includes(value) || v.fname.includes(value) || v.lname.includes(value) || v.phone_number.includes(value) || v.email.includes(value);
         });
-        cust_list = "<select class='form-control' id='user-list'>";
+        cust_list = "<label>Select a customer from below:</label>"
+        cust_list += "<select class='browser-default custom-select' id='user-list'>";
         for (x in found_names){
             cust_list += "<option value='"+found_names[x].id+"'>" + found_names[x].username +"</option>";
         }
         cust_list += "</select>";
         $('#customer_search_results').html(cust_list);
     });
-    
 
 $( "#check_reserv" ) .click (function(){
     if (!$('#datestamp').val() || !$("#num_of_people").val() || !$.isNumeric($("#num_of_people").val()))
@@ -87,14 +92,19 @@ $( "#check_reserv" ) .click (function(){
         {date: $('#datestamp').val(), num_of_people: $('#num_of_people').val()}, 
     function (data) {
         timeDropdown = timesToDropdown(JSON.parse(data));
-        if (timeDropdown){
-            toggleButton(false);
-            $('#time_placeholder').html(timeDropdown);
-        }
-        else{
+        console.log(timeDropdown);
+        if (!timeDropdown){
             addMessage("No available reservation for this date");
             toggleButton(true);
         }
+        else if (timeDropdown.includes("<select")){
+            toggleButton(false);
+            $('#time_placeholder').html(timeDropdown);
+        } else if (timeDropdown.includes("No available reservations")){
+            toggleButton(false);
+            $('#time_placeholder').html(timeDropdown);
+        }
+
     }).fail(fail_callback);
     });
 

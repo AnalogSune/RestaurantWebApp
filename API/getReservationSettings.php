@@ -1,4 +1,5 @@
 <?php
+//Get the restaurant schedule from database
 include('connect.php');
 
 $conn = connectToDb();

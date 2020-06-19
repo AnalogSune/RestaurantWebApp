@@ -1,0 +1,146 @@
+.header {
+    position: fixed;
+    width: 100%;
+    top: 0px;
+    z-index: 99;
+}
+
+.footer {
+    position: bottom;
+    bottom: 0px;
+    width: 100%;
+    height: 310px; 
+    color: white;
+    background-color: #343A40;
+}
+
+div#footer{
+    padding-bottom:20px;
+}
+
+.header-cont {
+    width: 100%;
+    position: fixed;
+    top: 0px;
+}
+  
+#content {
+    overflow: auto;
+    padding-top: 80px;
+    margin:0;
+    min-height: 60vh;
+}
+
+#logout {
+    position: fixed;
+    right: 20px;
+}
+
+body{
+    background-color: lightgray;
+}
+
+input{
+    background-color: lightgray;
+}
+
+#num_of_people{
+    width: 100px;
+}
+
+#reserv_buttons{
+    margin-top: 40px;
+    margin-left: 20px;
+}
+
+#customer-search{
+    margin-bottom: 40px;
+}
+
+#admin-search{
+    margin-top: 30px;
+}
+
+#reservations{
+    margin: auto;
+    padding: 20px;
+    width: 800px;
+}
+
+#reservation_info{
+    margin-top: 40px; 
+    margin-bottom: 20px; 
+}
+
+#social_media_icons{
+    margin-top: 20px; 
+}
+
+html, body{
+    height:100%;
+}
+
+/* dasd */
+
+#rest_menu {
+    padding: 20px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.lib-panel {
+    margin-bottom: 20Px;
+}
+.lib-panel img {
+    width: 100%;
+    background-color: transparent;
+}
+
+.lib-panel .row,
+.lib-panel .col-md-6 {
+    padding: 0;
+    background-color: #FFFFFF;
+}
+
+
+.lib-panel .lib-row {
+    padding: 0 20px 0 20px;
+}
+
+.lib-panel .lib-row.lib-header {
+    background-color: #FFFFFF;
+    font-size: 20px;
+    padding: 10px 20px 0 20px;
+}
+
+.lib-panel .lib-row.lib-header .lib-header-seperator {
+    height: 2px;
+    width: 26px;
+    background-color: #d9d9d9;
+    margin: 7px 0 7px 0;
+}
+
+.lib-panel .lib-row.lib-desc {
+    position: relative;
+    height: 100%;
+    display: block;
+    font-size: 13px;
+}
+.lib-panel .lib-row.lib-desc a{
+    position: absolute;
+    width: 100%;
+    bottom: 10px;
+    left: 20px;
+}
+
+.row-margin-bottom {
+    margin-bottom: 20px;
+}
+
+.box-shadow {
+    -webkit-box-shadow: 0 0 10px 0 rgba(0,0,0,.10);
+    box-shadow: 0 0 10px 0 rgba(0,0,0,.10);
+}
+
+.no-padding {
+    padding: 0;
+}

@@ -1,45 +1,50 @@
-<!-- Footer -->
-<footer class="page-footer fixed-bottom font-small bg-primary">
-
-    <!-- Footer Text -->
-    <div class="container-fluid text-center text-md-left">
-  
-      <!-- Grid row -->
-      <div class="row">
-  
-        <!-- Grid column -->
-        <div class="col-md-6 mt-md-0 mt-3">
-  
-          <!-- Content -->
-          <h5 class="text-uppercase font-weight-bold">Footer text 1</h5>
-          <p>Lorem ipsum </p>
-  
-        </div>
-        <!-- Grid column -->
-  
-        <hr class="clearfix w-100 d-md-none pb-3">
-  
-        <!-- Grid column -->
-        <div class="col-md-6 mb-md-0 mb-3">
-  
-          <!-- Content -->
-          <h5 class="text-uppercase font-weight-bold">Footer text 2</h5>
-          <p>Lorem ipsum poutanas gios</p>
-  
-        </div>
-        <!-- Grid column -->
-  
+<footer class="footer-area bg-f" id="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 col-md-6">
+        <h3>About Us</h3>
+        <p>general restaurant information, general restaurant information, general restaurant information, general restaurant information, general restaurant information.</p>
       </div>
-      <!-- Grid row -->
-  
+      <div class="col-lg-3 col-md-6">
+        <h3>Find us on Social</h3>
+        <div class="social_media_icons" id="social_media_icons">
+          <form class="social_media_icons">
+          <a href="https://www.facebook.com" target="_blank" style="margin-right: 20px;">
+            <img src="images/facebook.png" alt="facebook icon" width="50" height="50">
+          </a>
+          <a href="https://www.instagram.com" target="_blank" style="margin-right: 20px;">
+            <img src="images/instagram.png" alt="instagram icon" width="50" height="50">
+          </a>
+          <a href="https://www.linkedin.com/in/konstantinos-angelopoulos-634054192/" target="_blank">
+            <img src="images/linkedin.png" alt="linkedin icon" width="50" height="50">
+          </a>
+            <div class="clearfix"></div>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <h3>Contact information</h3>
+        <p>Ipsum Street, Lorem Tower, Athens, Greece</p>
+        <p><a href="#">+210 0000000</a></p>
+        <p><a href="#"> info@restaurant.com</a></p>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <h3>Opening hours</h3>
+        <p id="days_open"><span></span></p>
+      </div>
     </div>
-    <!-- Footer Text -->
-  
-    <!-- Copyright -->
-    <div class="footer-copyright text-center py-3">© 2020 Copyright:
-      <a href="https://mdbootstrap.com/"> MDBootstrap.com</a>
-    </div>
-    <!-- Copyright -->
-  
-  </footer>
-  <!-- Footer -->
+  </div>
+
+  <script>
+    $(document).ready(function(){
+      $.get ('API/getReservationSettings.php',
+    function(data){
+      txt = "";
+      jsonData = JSON.parse(data);
+      for (x in jsonData) {
+          txt += "<p>" + jsonData[x].day + " : " + (jsonData[x].open_time == null ? "Closed" : jsonData[x].open_time) + " - " + (jsonData[x].close_time == null ? "Closed" : jsonData[x].close_time) + "</p>";
+      }
+      $('#days_open').html(txt);
+    });
+  });
+  </script>

@@ -1,3 +1,4 @@
+//Display errors on page
 var cl;
 function addMessage(msg, isError = true){
     var fmsg = "<p><label class='text-" + (isError ? "danger" : "success") + "'>"+msg+"</label></p>";
